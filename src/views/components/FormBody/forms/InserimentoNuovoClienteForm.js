@@ -5,7 +5,7 @@ import axios from 'axios';
 import { submitForm } from '../../../../services/dbRequests';
 
 
-export function InserimentoNuovoClienteForm({form}) {
+export function InserimentoNuovoClienteForm({form , client}) {
 
   const [date, setDate] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');

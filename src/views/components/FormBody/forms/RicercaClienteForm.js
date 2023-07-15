@@ -1,11 +1,13 @@
 import { TextInput, Button, Group } from '@mantine/core';
 import { DbList } from '../../dbList';
 import { useState } from 'react';
+import { InserimentoNuovoClienteForm } from './InserimentoNuovoClienteForm';
 
 export function RicercaClienteForm({ form }) {
 
   const [showDb,setShowDb] = useState()
   const [filter,setFilter] = useState({codiceFiscale:"",cognome:""})
+  const [showClientModule,setShowClientModule] = useState()
 
   const handleShowDbList = (values)=>{
     setFilter((prev) => ({
@@ -19,9 +21,14 @@ export function RicercaClienteForm({ form }) {
   const resetFilter = ()=>{
     setFilter(null)
   }
+
+  const handleShowClientModule = ()=>{
+    setShowClientModule(true)
+  }
+
     return (
         <div style={{width:"100%" , display:"flex",flexDirection:"column",alignItems:"center"}}>    
-      <form onSubmit={form.onSubmit((values) => handleShowDbList(values))} style={{width:"20%"}} >
+      {!showClientModule && <form onSubmit={form.onSubmit((values) => handleShowDbList(values))} style={{width:"20%"}} >
         <TextInput
           label="Cognome"
           {...form.getInputProps('cognome')}
@@ -34,9 +41,14 @@ export function RicercaClienteForm({ form }) {
           <Button type="reset">Reset</Button>
           <Button type="submit" >Ricerca</Button>
         </Group>
-      </form>
+      </form>}
 
-      {showDb && <DbList filter={filter} resetFilter={resetFilter}/>}
+      {showDb && !showClientModule && <DbList filter={filter} resetFilter={resetFilter} handleShowClientModule={handleShowClientModule}/>}
+
+
+      {showClientModule && 
+       <InserimentoNuovoClienteForm form={form} client={""} />
+      }
         </div>
     );
   }

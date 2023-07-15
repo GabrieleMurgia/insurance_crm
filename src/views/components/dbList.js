@@ -2,10 +2,18 @@ import { useEffect, useState } from "react";
 import { deleteClient, getForms, searchClients } from "../../services/dbRequests";
 import { Box, Text, Badge, Button } from '@mantine/core';
 import { ScrollArea } from '@mantine/core';
+import { IconZoomIn } from "@tabler/icons-react";
+import { InserimentoNuovoClienteForm } from "./FormBody/forms/InserimentoNuovoClienteForm";
 
-export function DbList({filter , resetFilter}) {
+export function DbList({filter , resetFilter , handleShowClientModule}) {
 
   const [clients,setClients] = useState()
+  const [selectedClient, setSelectedClient] = useState(null)
+
+  const handleClientSelect = (client) => {
+    console.log(client)
+    return
+  }
 
   const removeClient = (id)=>{
       console.log(id)
@@ -30,7 +38,7 @@ export function DbList({filter , resetFilter}) {
 
     return (
         <div style={{width:"100%",display:"flex",alignItems:"center",flexDirection:"column"}}>
-              <ScrollArea w={"90%"} h={510} >
+              {!selectedClient && <ScrollArea w={"90%"} h={510} >
         {Array.isArray(clients) && clients.map((client)=>{
             return (
               <Box key={client.id}  sx={(theme) => ({
@@ -54,43 +62,16 @@ export function DbList({filter , resetFilter}) {
                 <Text fw={"bold"} size={"xl"}>{client.nome} {client.cognome}</Text> 
                 <Button color="red" style={{ alignSelf:"end" }} onClick={()=>{removeClient(client.id)}}>Rimuovi</Button>
                 </div>
-                <div style={{display:"flex",justifyContent:"center"}}>
-                <Text fw={"bold"} size={"l"}>{client.codiceFiscale}</Text> 
-                </div>
-                <div style={{display:"flex",justifyContent:"center",gap:"20px"}}>
+                <div style={{display:"flex",justifyContent:"center",gap:"10px",alignItems:"center"}}>
+                <Button  color="green" onClick={() => handleShowClientModule()}><IconZoomIn/></Button>
+                <Text size={"l"}><span style={{fontWeight:"bold"}}>Codice Fiscale:</span> {client.codiceFiscale}</Text> 
                 <Text> <span style={{fontWeight:"bold"}}>Data di nascita:</span> {new Date(client.dataDiNascita).toLocaleDateString()}</Text>
-                <Text><span style={{fontWeight:"bold"}}>Sesso:</span> {client.sesso}</Text>
                 </div>
-                
-               
-                <div style={{display:"flex",justifyContent:"center",gap:"20px"}}>
-               <Text><span style={{fontWeight:"bold"}}>Email:</span> {client.email}</Text>
-                <Text><span style={{fontWeight:"bold"}}>Telefono:</span> {client.telefono1}</Text>
-                <Text><span style={{fontWeight:"bold"}}>Telefono 2:</span> {client.telefono2}</Text>
-               </div>
-              
-               <div style={{display:"flex",justifyContent:"center",gap:"20px"}}>
-               <Text><span style={{fontWeight:"bold"}}>Luogo di nascita:</span> {client.luogo}</Text>
-                <Text><span style={{fontWeight:"bold"}}>Nazione:</span> {client.nazione}</Text>
-               </div>
-                
-               <div style={{display:"flex",justifyContent:"center",gap:"20px"}}>
-               <Text><span style={{fontWeight:"bold"}}>Indirizzo:</span> {client.indirizzo}</Text>
-                <Text><span style={{fontWeight:"bold"}}>Regione:</span> {client.regione}</Text>
-                <Text><span style={{fontWeight:"bold"}}>Provincia:</span> {client.provincia}</Text>
-               </div>
-
-               <div style={{display:"flex",justifyContent:"center",gap:"20px"}}>
-               <Text><span style={{fontWeight:"bold"}}>Comune:</span> {client.comune}</Text>
-                <Text><span style={{fontWeight:"bold"}}>CAP:</span> {client.cap}</Text>
-               </div>
-               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"10px",borderTop:"1px solid gray"}}>
-                
-               </div>
               </Box>
             )
         })}
-        </ScrollArea>
+        </ScrollArea>}
+      
     </div>
     )
     
