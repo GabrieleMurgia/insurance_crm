@@ -1,23 +1,24 @@
-import logo from './logo.svg';
+import { useState } from 'react';
 import './App.css';
+import { linksHeader } from './utils/variabili';
+import { FormBody } from './views/components/FormBody/FormBody';
+import { HeaderMenu } from './views/components/HeaderMenu';
+
 
 function App() {
+
+  const [typeForm,setTypeForm] = useState()
+
+  const handleTypeForm = (type)=>{
+    setTypeForm(type)
+  }
+
+  
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+     <h1>Toretto Assicurazioni</h1>
+      <HeaderMenu links={linksHeader} handleTypeForm={handleTypeForm}/>
+      <FormBody type={typeForm}/>
     </div>
   );
 }
