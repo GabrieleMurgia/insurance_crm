@@ -16,7 +16,6 @@ export function DbList({filter , resetFilter , handleShowClientModule}) {
   }
 
   const removeClient = (id)=>{
-      console.log(id)
       deleteClient(id).then(data => setClients(data))
       .catch(error => console.error('Error:', error));
   }
@@ -29,12 +28,10 @@ export function DbList({filter , resetFilter , handleShowClientModule}) {
     } else {
         searchClients(filter.cognome,filter.codiceFiscale).then(data => {
           setClients(data);
-          console.log(data)
-          
         })
         .catch(error => console.error('Error:', error));
       }
-  },[filter]) // Remove 'clients' from the dependencies
+  },[filter])
 
     return (
         <div style={{width:"100%",display:"flex",alignItems:"center",flexDirection:"column"}}>
@@ -63,7 +60,7 @@ export function DbList({filter , resetFilter , handleShowClientModule}) {
                 <Button color="red" style={{ alignSelf:"end" }} onClick={()=>{removeClient(client.id)}}>Rimuovi</Button>
                 </div>
                 <div style={{display:"flex",justifyContent:"center",gap:"10px",alignItems:"center"}}>
-                <Button  color="green" onClick={() => handleShowClientModule()}><IconZoomIn/></Button>
+                <Button  color="green" onClick={() => handleShowClientModule(client)}><IconZoomIn/></Button>
                 <Text size={"l"}><span style={{fontWeight:"bold"}}>Codice Fiscale:</span> {client.codiceFiscale}</Text> 
                 <Text> <span style={{fontWeight:"bold"}}>Data di nascita:</span> {new Date(client.dataDiNascita).toLocaleDateString()}</Text>
                 </div>

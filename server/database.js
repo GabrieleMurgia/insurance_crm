@@ -23,7 +23,8 @@ db.run(`CREATE TABLE IF NOT EXISTS formTable (
   telefono1 TEXT,
   telefono2 TEXT,
   email TEXT,
-  codiceFiscale TEXT
+  codiceFiscale TEXT,
+  polizza TEXT
 )`);
 
 module.exports = db;

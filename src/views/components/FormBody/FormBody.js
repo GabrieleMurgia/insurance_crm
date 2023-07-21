@@ -9,9 +9,7 @@ import { useFormConfiguration } from '../../../utils/useFormConfiguration';
 
 export function FormBody({type}) {
 
- const formInserimento = useFormConfiguration({type: "Inserimento Nuovo Cliente"})
  const formRicercaCliente = useFormConfiguration({type: "Ricerca Cliente"})
-
  const form = useFormConfiguration("")
 
 
@@ -20,7 +18,7 @@ export function FormBody({type}) {
     <h2>{type}</h2>
     <Box mx="auto" style={{display:"flex",justifyContent:"center"}}>
      {type === "Ricerca Cliente" && <RicercaClienteForm form={formRicercaCliente} />}
-      {type === "Inserimento Nuovo Cliente" && <InserimentoNuovoClienteForm form={formInserimento} />}
+      {type === "Inserimento Nuovo Cliente" && <InserimentoNuovoClienteForm />}
       {type === "Ricerca Polizza" && <RicercaPolizzaForm form={form} />}
       {type === "Polizze in Scadenza" && <PolizzeInScadenzaForm form={form} />}
       {type === "Rate in Scadenza" && <RateInScadenzaForm form={form} />}

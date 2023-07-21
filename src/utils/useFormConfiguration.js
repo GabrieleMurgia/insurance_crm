@@ -1,8 +1,10 @@
 import { useForm } from "@mantine/form";
+import { useEffect, useMemo } from "react";
 
-export function useFormConfiguration({type}) {
-  const formInserimento = useForm({
-    initialValues: {
+export function useFormConfiguration({type , client}) {
+  
+  const formInserimentoConfig = useMemo(() => ({
+    initialValues: client || {
       cognome: '',
       nome: '',
       sesso: '',
@@ -38,9 +40,50 @@ export function useFormConfiguration({type}) {
       telefono1: (value) => (!value ? 'Campo obbligatorio' : null),
       email: (value) => (!value ? 'Campo obbligatorio' : null),
     },
-  });
+  }), [client]);
 
-  const formDefault = useForm({
+  const formInserimentoPolizzaConfig = useMemo(() => ({
+    initialValues: {
+      puntoVendita: '',
+      compagnia: '',
+      polizza: '',
+      prodotto: '',
+      targa: '',
+      periodicità: '',
+      effetto: '',
+      scadenza: '',
+      premio: '',
+      commissioni: '',
+      autocontrollo: '',
+      stato: '',
+      attiva: '',
+      sospensione: '',
+      motivoSospensione: '',
+      note: '',
+    },
+  
+    validate: {
+      /* da fare */
+     /*  puntoVendita: (value) => (!value ? 'Campo obbligatorio' : null),
+      compagnia: (value) => (!value ? 'Campo obbligatorio' : null),
+      polizza: (value) => (!value ? 'Campo obbligatorio' : null),
+      prodotto: (value) => (!value ? 'Campo obbligatorio' : null),
+      targa: (value) => (!value ? 'Campo obbligatorio' : null),
+      periodicità: (value) => (!value ? 'Campo obbligatorio' : null),
+      effetto: (value) => (!value ? 'Campo obbligatorio' : null),
+      scadenza: (value) => (!value ? 'Campo obbligatorio' : null),
+      premio: (value) => (!value ? 'Campo obbligatorio' : null),
+      commissioni: (value) => (!value ? 'Campo obbligatorio' : null),
+      autocontrollo: (value) => (!value ? 'Campo obbligatorio' : null),
+      stato: (value) => (!value ? 'Campo obbligatorio' : null),
+      attiva: (value) => (!value ? 'Campo obbligatorio' : null),
+      sospensione: (value) => (!value ? 'Campo obbligatorio' : null),
+      motivoSospensione: (value) => (!value ? 'Campo obbligatorio' : null),
+      note: (value) => (!value ? 'Campo obbligatorio' : null), */
+    },
+  }), []);
+
+  const formDefaultConfig = useMemo(() => ({
     initialValues: {
       email: '',
     },
@@ -48,9 +91,9 @@ export function useFormConfiguration({type}) {
     validate: {
       email: (value) => (!value ? 'Campo obbligatorio' : null),
     },
-  })
+  }), [])
 
-  const formRicercaCliente = useForm({
+  const formRicercaClienteConfig = useMemo(() => ({
     initialValues: {
       cognome: '',
       codiceFiscale:'',
@@ -60,13 +103,26 @@ export function useFormConfiguration({type}) {
       cognome: (value) => (!value ? 'Campo obbligatorio' : null),
       
     },
-  });
+  }), []);
+
+  const formInserimento = useForm(formInserimentoConfig);
+  const formInserimentoPolizza = useForm(formInserimentoPolizzaConfig);
+  const formDefault = useForm(formDefaultConfig);
+  const formRicercaCliente = useForm(formRicercaClienteConfig);
+
+  useEffect(() => {
+    if (client) {
+      formInserimento.reset(client);
+    }
+  }, [client]);
 
 
   if(type === "Inserimento Nuovo Cliente"){
     return formInserimento
   }else if(type === "Ricerca Cliente"){
     return formRicercaCliente
+  } else if(type === "Inserimento Nuova polizza"){
+    return formInserimentoPolizza
   } 
   else{
     return formDefault

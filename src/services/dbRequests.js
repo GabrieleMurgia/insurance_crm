@@ -52,3 +52,27 @@ export function searchClients(cognome, codiceFiscale) {
     throw error;
   });
 }
+
+export function updateClientPolizza(id, polizzaValues) {
+  console.log("ciao")
+  return axios.put(`${API_URL}/update-client-polizza`, { id, polizzaValues })
+    .then(response => response.data)
+    .catch(error => {
+      console.error('There was an error!', error);
+      throw error;
+    });
+}
+
+export function searchByDate(year, month) {
+  return axios.get(`${API_URL}/search-by-date`, {
+    params: {
+      year: year,
+      month: month,
+    },
+  })
+  .then(response => response.data)
+  .catch(error => {
+    console.error('There was an error!', error);
+    throw error;
+  });
+}

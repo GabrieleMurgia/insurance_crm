@@ -1,6 +1,6 @@
-import { TextInput, Button, Group } from '@mantine/core';
+import { TextInput, Button, Group, Box } from '@mantine/core';
 import { DbList } from '../../dbList';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { InserimentoNuovoClienteForm } from './InserimentoNuovoClienteForm';
 
 export function RicercaClienteForm({ form }) {
@@ -8,6 +8,7 @@ export function RicercaClienteForm({ form }) {
   const [showDb,setShowDb] = useState()
   const [filter,setFilter] = useState({codiceFiscale:"",cognome:""})
   const [showClientModule,setShowClientModule] = useState()
+  const [client,setClient]= useState()
 
   const handleShowDbList = (values)=>{
     setFilter((prev) => ({
@@ -22,12 +23,28 @@ export function RicercaClienteForm({ form }) {
     setFilter(null)
   }
 
-  const handleShowClientModule = ()=>{
-    setShowClientModule(true)
+  const handleShowClientModule = (client)=>{
+    setClient(client);
+    setShowClientModule(true);
+
+
   }
 
+  const updateClient = (newClient) => {
+    setClient(newClient);
+  };
+
+  useEffect(()=>{
+    if(client){
+      setShowClientModule(true)
+    }
+  },[client])
+
+
+
     return (
-        <div style={{width:"100%" , display:"flex",flexDirection:"column",alignItems:"center"}}>    
+        <div style={{width:"100%" , display:"flex",flexDirection:"column",alignItems:"center"}}>
+
       {!showClientModule && <form onSubmit={form.onSubmit((values) => handleShowDbList(values))} style={{width:"20%"}} >
         <TextInput
           label="Cognome"
@@ -47,9 +64,10 @@ export function RicercaClienteForm({ form }) {
 
 
       {showClientModule && 
-       <InserimentoNuovoClienteForm form={form} client={""} />
+       <InserimentoNuovoClienteForm client={client} updateClient={updateClient} />
       }
+
+     
         </div>
     );
   }
-  
