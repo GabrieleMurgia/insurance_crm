@@ -10,33 +10,56 @@ app.use(bodyParser.json());
 app.post('/submit-form', (req, res) => {
   const formValues = req.body;
 
-  // Recupera l'array esistente di polizze
-  db.get('SELECT polizza FROM formTable WHERE id = ?', [formValues.id], (err, row) => {
-    if (err) {
-      console.error(err.message);
-      res.status(500).json({ message: 'Error retrieving existing policies.' });
-    } else {
-      // Analizza l'array di polizze dal database
-      let existingPolicies = JSON.parse(row.polizza || '[]');
+  console.log(formValues)
 
-      // Aggiungi la nuova polizza all'array
-      existingPolicies.push(formValues.polizza);
+  // Se polizza è null, imposta una stringa vuota
+  if (formValues.polizza === null) {
+    formValues.polizza = '';
+  }
 
-      // Inserisci l'array aggiornato nel database
-      db.run(`UPDATE formTable SET polizza = ? WHERE id = ?`,
-        [JSON.stringify(existingPolicies), formValues.id],
-        function(err) {
-          if (err) {
-            console.error(err.message);
-            res.status(500).json({ message: 'Error updating policies.' });
-          } else {
-            console.log(`Policies for client with id ${formValues.id} have been updated.`);
-            res.json({ message: 'Form submitted successfully.' });
+  if (formValues.id) {
+    // Se l'ID esiste, aggiorna l'elemento esistente
+    db.get('SELECT polizza FROM formTable WHERE id = ?', [formValues.id], (err, row) => {
+      if (err) {
+        console.error(err.message);
+        res.status(500).json({ message: 'Error retrieving existing policies.' });
+      } else {
+        // Analizza l'array di polizze dal database
+        let existingPolicies = JSON.parse(row?.polizza || '[]');
+
+        // Aggiungi la nuova polizza all'array
+        existingPolicies.push(formValues.polizza);
+
+        // Inserisci l'array aggiornato nel database
+        db.run(`UPDATE formTable SET polizza = ? WHERE id = ?`,
+          [JSON.stringify(existingPolicies), formValues.id],
+          function(err) {
+            if (err) {
+              console.error(err.message);
+              res.status(500).json({ message: 'Error updating policies.' });
+            } else {
+              console.log(`Policies for client with id ${formValues.id} have been updated.`);
+              res.json({ message: 'Form submitted successfully.' });
+            }
           }
+        );
+      }
+    });
+  } else {
+    // Se l'ID non esiste, inserisci un nuovo elemento
+    db.run(`INSERT INTO formTable (nome, cognome, sesso, dataDiNascita, luogo, nazione, indirizzo, regione, provincia, comune, cap, telefono1, telefono2, email, codiceFiscale, polizza) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [formValues.nome, formValues.cognome, formValues.sesso, formValues.dataDiNascita, formValues.luogo, formValues.nazione, formValues.indirizzo, formValues.regione, formValues.provincia, formValues.comune, formValues.cap, formValues.telefono1, formValues.telefono2, formValues.email, formValues.codiceFiscale, JSON.stringify([formValues.polizza])],
+      function(err) {
+        if (err) {
+          console.error(err.message);
+          res.status(500).json({ message: 'Error inserting new client.' });
+        } else {
+          console.log(`A new client has been inserted.`);
+          res.json({ message: 'Form submitted successfully.' });
         }
-      );
-    }
-  });
+      }
+    );
+  }
 });
 
 app.get('/get-forms', (req, res) => {

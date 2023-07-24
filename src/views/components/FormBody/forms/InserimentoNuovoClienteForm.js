@@ -9,8 +9,6 @@ import { Select } from '@mantine/core';
 import ItemPolizza from '../../policyDetails/elementoPolizze';
 import { ScrollArea } from '@mantine/core';
 
-
-
 export function InserimentoNuovoClienteForm({client , updateClient}) {
 
   const form = useFormConfiguration({type: "Inserimento Nuovo Cliente",client});
@@ -23,12 +21,21 @@ export function InserimentoNuovoClienteForm({client , updateClient}) {
   const [province, setProvince] = useState([]);
 
   const handleSubmitForm = (client, values) => {
+    console.log(values)
     if (!client) {
-      submitForm(values)
+      if(values.polizza){
+        submitForm(values)
         .then(data => {
-          updateClient(data); // Aggiorna lo stato `client` utilizzando la funzione callback
+          if(updateClient)updateClient(data); // Aggiorna lo stato `client` utilizzando la funzione callback
         })
         .catch(error => console.error('Error:', error));
+      }else{
+        submitForm({...values,polizza:""})
+        .then(data => {
+          if(updateClient)updateClient(data); // Aggiorna lo stato `client` utilizzando la funzione callback
+        })
+        .catch(error => console.error('Error:', error));
+      }
     } else {
       alert("fatto");
     }
@@ -68,9 +75,9 @@ export function InserimentoNuovoClienteForm({client , updateClient}) {
     return (
       <>
       {!showInserimentoPolizza &&
-      <form onSubmit={form.onSubmit((values) => {
-        handleSubmitForm(client,values)
-})}>
+       <form onSubmit={form.onSubmit((values) => {
+        handleSubmitForm(client,values);
+      })}>
       <div style={{display:"flex",justifyContent:"space-between"}}>
       <TextInput
           label="Cognome"
@@ -105,14 +112,23 @@ export function InserimentoNuovoClienteForm({client , updateClient}) {
 
         <div style={{display:"flex",justifyContent:"space-between"}}>
 
-      <DatePickerInput
+     {/*  <DatePickerInput
         placeholder=" Data di nascita "
         label=" Data Di nascita "
         withAsterisk
         value={client?.['dataDiNascita'] ? new Date(client?.['dataDiNascita']) : null}
         {...form.getInputProps(client?.['dataDiNascita'] ? new Date(client?.['dataDiNascita']) : null)}
         error={form.errors.scadenza}
-        />
+        /> */}
+
+<DatePickerInput
+  placeholder=" Data di nascita "
+  label=" Data Di nascita "
+  withAsterisk
+  value={client?.['dataDiNascita'] ? new Date(client?.['dataDiNascita']) : null}
+  onChange={(date) => form.setFieldValue('dataDiNascita', date)}
+  error={form.errors.dataDiNascita}
+/>
 
        <div>
        <TextInput
