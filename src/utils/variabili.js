@@ -284,26 +284,17 @@ export const linksHeader = [
     {Ven: ['Belluno', 'Padova', 'Rovigo', 'Treviso', 'Venezia', 'Verona', 'Vicenza']},
 ];
 
-/* 
-  export const provincePerRegione = [
-    {regione: 'Abr', province: ['Chieti', "L'Aquila", 'Pescara', 'Teramo']},
-    {regione: 'Basi', province: ['Matera', 'Potenza']},
-    {regione: 'Cal', province: ['Catanzaro', 'Cosenza', 'Crotone', 'Reggio Calabria', 'Vibo Valentia']},
-    {regione: 'Cam', province: ['Avellino', 'Benevento', 'Caserta', 'Napoli', 'Salerno']},
-    {regione: 'Emi', province: ['Bologna', 'Ferrara', 'Forlì-Cesena', 'Modena', 'Parma', 'Piacenza', 'Ravenna', 'Reggio Emilia', 'Rimini']},
-    {regione: 'Fri', province: ['Gorizia', 'Pordenone', 'Trieste', 'Udine']},
-    {regione: 'Laz', province: ['Frosinone', 'Latina', 'Rieti', 'Roma', 'Viterbo']},
-    {regione: 'Lig', province: ['Genova', 'Imperia', 'La Spezia', 'Savona']},
-    {regione: 'Lom', province: ['Bergamo', 'Brescia', 'Como', 'Cremona', 'Lecco', 'Lodi', 'Mantova', 'Milano', 'Monza e Brianza', 'Pavia', 'Sondrio', 'Varese']},
-    {regione: 'Mar', province: ['Ancona', 'Ascoli Piceno', 'Fermo', 'Macerata', 'Pesaro e Urbino']},
-    {regione: 'Mol', province: ['Campobasso', 'Isernia']},
-    {regione: 'Pie', province: ['Alessandria', 'Asti', 'Biella', 'Cuneo', 'Novara', 'Torino', 'Verbano-Cusio-Ossola', 'Vercelli']},
-    {regione: 'Pug', province: ['Bari', 'Barletta-Andria-Trani', 'Brindisi', 'Foggia', 'Lecce', 'Taranto']},
-    {regione: 'Sar', province: ['Cagliari', 'Carbonia-Iglesias', 'Medio Campidano', 'Nuoro', 'Ogliastra', 'Olbia-Tempio', 'Oristano', 'Sassari']},
-    {regione: 'Sic', province: ['Agrigento', 'Caltanissetta', 'Catania', 'Enna', 'Messina', 'Palermo', 'Ragusa', 'Siracusa', 'Trapani']},
-    {regione: 'Tos', province: ['Arezzo', 'Firenze', 'Grosseto', 'Livorno', 'Lucca', 'Massa-Carrara', 'Pisa', 'Pistoia', 'Prato', 'Siena']},
-    {regione: 'TAA', province: ['Bolzano', 'Trento']},
-    {regione: 'Umb', province: ['Perugia', 'Terni']},
-    {regione: 'Val', province: ["Valle d'Aosta"]},
-    {regione: 'Ven', province: ['Belluno', 'Padova', 'Rovigo', 'Treviso', 'Venezia', 'Verona', 'Vicenza']},
-]; */
+export const periodicitàPolizza = [
+  { value: 'Annuale', label: 'Annuale' },
+  { value: 'Semestrale', label: 'Semestrale' },
+  { value: 'Quadrimestrale', label: 'Quadrimestrale' },
+  { value: 'Trimestrale', label: 'Trimestrale' },
+  { value: 'Mensile', label: 'Mensile' },
+  { value: 'Temporanea', label: 'Temporanea' },
+];
+
+export const statoPolizza = [
+  { value: 'Attiva', label: 'Attiva' },
+  { value: 'Sospesa', label: 'Sospesa' },
+  { value: 'Inattiva', label: 'Inattiva' },
+];

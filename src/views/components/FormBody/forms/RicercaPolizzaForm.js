@@ -1,8 +1,49 @@
+import React, { useEffect, useState } from 'react';
 import { TextInput, Button, Group } from '@mantine/core';
+import ItemPolizza from '../../policyDetails/elementoPolizze';
+import { getForms } from '../../../../services/dbRequests';
+import { ScrollArea } from '@mantine/core';
 
 export function RicercaPolizzaForm({ form }) {
+
+  const [policies, setPolicies] = useState([]);
+  const [filteredPolicies, setFilteredPolicies] = useState([]);
+
+  useEffect(() => {
+    let tempArray = []
+    let tempItem = ""
+    getForms()
+    .then(data => {
+      data.map(item=>{
+        if(item.polizza.length !== 0){
+          tempItem = JSON.parse(item.polizza)
+          tempItem.map(genni =>{
+            tempArray.push({...genni,nome:item.nome,cognome:item.cognome})
+          })
+          tempItem = null
+        }
+      })
+      let flattenedArray = tempArray.flat();
+      console.log(flattenedArray)
+      setPolicies(flattenedArray)
+      setFilteredPolicies(flattenedArray)
+    })
+    .catch(error => console.error('Error:', error))
+  }, []);
+
+  const handleSearch = (values) => {
+    let filtered = policies.filter(policy => {
+      return Object.keys(values).every(key => {
+        return String(policy[key]).toLowerCase().includes(String(values[key]).toLowerCase());
+      });
+    });
+    setFilteredPolicies(filtered);
+  }
+
+
   return (
-    <form onSubmit={form.onSubmit((values) => console.log(values))}>
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
+    <form onSubmit={form.onSubmit((values) => handleSearch(values))}>
         <div style={{display:"flex"}}>
         <TextInput
         label="Cognome"
@@ -34,5 +75,13 @@ export function RicercaPolizzaForm({ form }) {
         <Button type="submit">Ricerca</Button>
       </Group>
     </form>
+    <div>
+       <ScrollArea h={160}>
+       {filteredPolicies.map((policy, index) => (
+         <ItemPolizza key={index} polizza={policy} />
+      ))}
+      </ScrollArea>
+    </div>
+    </div>
   );
 }

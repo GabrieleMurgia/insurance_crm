@@ -83,6 +83,18 @@ export function useFormConfiguration({type , client}) {
     },
   }), []);
 
+  const formRicercaPolizzaConfig = useMemo(() => ({
+    initialValues: {
+      cognome: '',
+      nome: '',
+      targa: '',
+      polizza: '',
+      puntoVendita: '',
+      compagnia: '',
+    },
+  }), []);
+  
+
   const formDefaultConfig = useMemo(() => ({
     initialValues: {
       email: '',
@@ -109,6 +121,7 @@ export function useFormConfiguration({type , client}) {
   const formInserimentoPolizza = useForm(formInserimentoPolizzaConfig);
   const formDefault = useForm(formDefaultConfig);
   const formRicercaCliente = useForm(formRicercaClienteConfig);
+  const formRicercaPolizza = useForm(formRicercaPolizzaConfig);
 
   useEffect(() => {
     if (client) {
@@ -123,8 +136,9 @@ export function useFormConfiguration({type , client}) {
     return formRicercaCliente
   } else if(type === "Inserimento Nuova polizza"){
     return formInserimentoPolizza
-  } 
-  else{
+  } else if(type === "Ricerca Polizza"){
+    return formRicercaPolizza
+  } else{
     return formDefault
   }
 }

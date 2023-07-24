@@ -9,25 +9,48 @@ app.use(bodyParser.json());
 
 app.post('/submit-form', (req, res) => {
   const formValues = req.body;
-  db.run(`INSERT INTO formTable (nome, cognome, sesso, dataDiNascita, luogo, nazione, indirizzo, regione, provincia, comune, cap, telefono1, telefono2, email, codiceFiscale) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [formValues.nome, formValues.cognome, formValues.sesso, formValues.dataDiNascita, formValues.luogo, formValues.nazione, formValues.indirizzo, formValues.regione, formValues.provincia, formValues.comune, formValues.cap, formValues.telefono1, formValues.telefono2, formValues.email ,formValues.codiceFiscale],
-    function(err) {
-      if (err) {
-        return console.log(err.message);
-      }
-      console.log(`A row has been inserted with rowid ${this.lastID}`);
-    });
-  res.json({ message: 'Form submitted successfully.' });
+
+  // Recupera l'array esistente di polizze
+  db.get('SELECT polizza FROM formTable WHERE id = ?', [formValues.id], (err, row) => {
+    if (err) {
+      console.error(err.message);
+      res.status(500).json({ message: 'Error retrieving existing policies.' });
+    } else {
+      // Analizza l'array di polizze dal database
+      let existingPolicies = JSON.parse(row.polizza || '[]');
+
+      // Aggiungi la nuova polizza all'array
+      existingPolicies.push(formValues.polizza);
+
+      // Inserisci l'array aggiornato nel database
+      db.run(`UPDATE formTable SET polizza = ? WHERE id = ?`,
+        [JSON.stringify(existingPolicies), formValues.id],
+        function(err) {
+          if (err) {
+            console.error(err.message);
+            res.status(500).json({ message: 'Error updating policies.' });
+          } else {
+            console.log(`Policies for client with id ${formValues.id} have been updated.`);
+            res.json({ message: 'Form submitted successfully.' });
+          }
+        }
+      );
+    }
+  });
 });
 
 app.get('/get-forms', (req, res) => {
-    db.all('SELECT * FROM formTable', [], (err, rows) => {
-      if (err) {
-        throw err;
-      }
-      res.json(rows); // Invia i risultati come risposta JSON
+  db.all('SELECT * FROM formTable', [], (err, rows) => {
+    if (err) {
+      throw err;
+    }
+    // Analizza l'array di polizze per ogni riga
+    rows.forEach(row => {
+      row.polizza = JSON.parse(row.polizza || '[]');
     });
+    res.json(rows); // Invia i risultati come risposta JSON
   });
+});
 
   app.get('/search-clients', (req, res) => {
     const { cognome, codiceFiscale } = req.query;

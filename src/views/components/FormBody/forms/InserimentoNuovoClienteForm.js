@@ -6,6 +6,8 @@ import { InserimentoPolizzaForm } from './InserimentoPolizza';
 import { DatePickerInput } from '@mantine/dates';
 import { nazioniDelMondo, provincePerRegione, regioniItaliane } from '../../../../utils/variabili';
 import { Select } from '@mantine/core';
+import ItemPolizza from '../../policyDetails/elementoPolizze';
+import { ScrollArea } from '@mantine/core';
 
 
 
@@ -14,18 +16,16 @@ export function InserimentoNuovoClienteForm({client , updateClient}) {
   const form = useFormConfiguration({type: "Inserimento Nuovo Cliente",client});
   const [errorMessage] = useState('');
   const [showInserimentoPolizza, setShowInserimentoPolizza] = useState(false);
-  const [polizza,setPolizza] = useState()
+  const [polizze,setPolizze] = useState([])
   const [valueRegione, setValueRegione] = useState(null)
   const [valueNazione, setValueNazione] = useState(null)
   const [valueProvincia, setValueProvincia] = useState(null);
   const [province, setProvince] = useState([]);
 
-
   const handleSubmitForm = (client, values) => {
     if (!client) {
       submitForm(values)
         .then(data => {
-  
           updateClient(data); // Aggiorna lo stato `client` utilizzando la funzione callback
         })
         .catch(error => console.error('Error:', error));
@@ -53,13 +53,13 @@ export function InserimentoNuovoClienteForm({client , updateClient}) {
 
   useEffect(()=>{
     if(client && client.polizza) {
-      if (typeof client.polizza === 'string') {
-        try {
-          const polizzaObject = JSON.parse(client.polizza);
-          setPolizza(polizzaObject);
-        } catch (error) {
-          console.error('Error parsing JSON:', error);
-        }
+      try {
+        const polizzeData = JSON.parse(JSON.parse(client.polizza))
+        setPolizze(polizzeData);
+        console.log(polizze)
+      } catch (error) {
+        // Log any error during parsing
+        console.error('Error parsing JSON:', error);
       }
     }
   },[client])
@@ -219,19 +219,15 @@ export function InserimentoNuovoClienteForm({client , updateClient}) {
       }
       {showInserimentoPolizza && <InserimentoPolizzaForm client={client}/>}
 
-      {!showInserimentoPolizza && client?.polizza &&
-      <Box display={"flex"} style={{gap:"20px",marginTop:"10px",padding:"10px 20px",backgroundColor:"rgb(240, 240, 240)",borderRadius:"15px",border:"1px solid rgb(175, 175, 175)"}}>
-      <div style={{display:"flex",flexDirection:"column"}}> <span style={{fontWeight:"bold"}}>Punto Vendita:</span> <span>{polizza?.compagnia}</span> </div>
-<div style={{display:"flex",flexDirection:"column"}}> <span style={{fontWeight:"bold"}}>Polizza:</span> <span>{polizza?.polizza}</span> </div>
-<div style={{display:"flex",flexDirection:"column"}}> <span style={{fontWeight:"bold"}}>Prodotto:</span> <span>{polizza?.prodotto}</span> </div>
-<div style={{display:"flex",flexDirection:"column"}}> <span style={{fontWeight:"bold"}}>Targa:</span> <span>{polizza?.targa}</span> </div>
-<div style={{display:"flex",flexDirection:"column"}}> <span style={{fontWeight:"bold"}}>Effetto:</span> <span>{polizza?.effetto}</span> </div>
-<div style={{display:"flex",flexDirection:"column"}}> <span style={{fontWeight:"bold"}}>Scadenza:</span> <span>{polizza?.scadenza}</span> </div>
-<div style={{display:"flex",flexDirection:"column"}}> <span style={{fontWeight:"bold"}}>Premio:</span> <span>{polizza?.premio}</span> </div>
-<div style={{display:"flex",flexDirection:"column"}}> <span style={{fontWeight:"bold"}}>Commissioni:</span> <span>{polizza?.commissioni}</span> </div>
-<div style={{display:"flex",flexDirection:"column"}}> <span style={{fontWeight:"bold"}}>Totale:</span> <span>{polizza?.totale + polizza?.premio }</span> </div>
-<div style={{display:"flex",flexDirection:"column"}}> <span style={{fontWeight:"bold"}}>Rata:</span> <span>{polizza?.totale + polizza?.premio }</span> </div>
-      </Box> 
+     
+    {!showInserimentoPolizza && polizze &&
+     <div>
+      <ScrollArea h={130}>
+      { polizze.map((polizza, index) => (
+        <ItemPolizza polizza={polizza}/>
+        ))}
+        </ScrollArea>
+     </div>
       }
       </>
     );

@@ -1,14 +1,34 @@
 import { Button, Group } from '@mantine/core';
 import { YearPickerInput } from '@mantine/dates';
 import { MonthPickerInput } from '@mantine/dates';
-import { useState } from 'react';
-import { searchByDate } from '../../../../services/dbRequests';
+import { useEffect, useState } from 'react';
+import { getForms, searchByDate } from '../../../../services/dbRequests';
 
 
 export function PolizzeInScadenzaForm({ form }) {
 
   const [year, setYear] = useState(null);
   const [month, setMonth] = useState(null);
+  const [policies, setPolicies] = useState([]);
+
+
+  useEffect(()=>{
+    let tempArray = []
+    let tempItem = ""
+    getForms()
+    .then(data => {
+      data.map(item=>{
+        if(item.polizza.length !== 0){
+          tempItem = JSON.parse(item.polizza)
+          tempArray.push(tempItem)
+          tempItem = null
+        }
+      })
+      let flattenedArray = tempArray.flat(); // Questa linea appiattisce l'array
+      setPolicies(flattenedArray)
+    })
+    .catch(error => console.error('Error:', error))
+  },[])
 
   const handleYearChange = (newYear) => {
     if (newYear) {
@@ -21,8 +41,6 @@ export function PolizzeInScadenzaForm({ form }) {
 
   const handleMonthChange = (newMonth) => {
     if (newMonth) {
-    /*   console.log('Month:', newMonth.getMonth() + 1);
-      console.log('Year:', newMonth.getFullYear()); */
       setMonth(newMonth);
     } else {
       setMonth(null);
@@ -31,10 +49,47 @@ export function PolizzeInScadenzaForm({ form }) {
 
 
   const handleSubmit = async (event) => {
-    event.preventDefault(); // Prevent the form from being submitted in the default way
-    // Call the new route with the year and month as parameters
-    const data = await searchByDate(year ? year.getFullYear() : null, month ? month.getMonth() + 1 : null);
-    console.log(data);
+    event.preventDefault(); 
+  
+    // Create a new Date object from the selected year and month
+    const selectedDate = new Date(year.getFullYear(), month.getMonth() + 1, 1); // Month is 0-indexed, so we add 1
+  
+    // Define the end dates for each periodicity
+    const endDateAnnuale = new Date(selectedDate);
+    endDateAnnuale.setFullYear(endDateAnnuale.getFullYear() + 1);
+  
+    const endDateSemestrale = new Date(selectedDate);
+    endDateSemestrale.setMonth(endDateSemestrale.getMonth() + 6);
+  
+    const endDateTrimestrale = new Date(selectedDate);
+    endDateTrimestrale.setMonth(endDateTrimestrale.getMonth() + 3);
+  
+    const endDateMensile = new Date(selectedDate);
+    endDateMensile.setMonth(endDateMensile.getMonth() + 1);
+  
+    // Filter the policies
+    const filteredPolicies = {
+      annuale: [],
+      semestrale: [],
+      trimestrale: [],
+      mensile: [],
+    };
+  
+    policies.forEach(policy => {
+      const policyScadenza = new Date(policy.scadenza);
+  
+      if (policy.periodicita === 'Annuale' && policyScadenza <= endDateAnnuale) {
+        filteredPolicies.annuale.push(policy);
+      } else if (policy.periodicita === 'Semestrale' && policyScadenza <= endDateSemestrale) {
+        filteredPolicies.semestrale.push(policy);
+      } else if (policy.periodicita === 'Trimestrale' && policyScadenza <= endDateTrimestrale) {
+        filteredPolicies.trimestrale.push(policy);
+      } else if (policy.periodicita === 'Mensile' && policyScadenza <= endDateMensile) {
+        filteredPolicies.mensile.push(policy);
+      }
+    });
+  
+    console.log(filteredPolicies);
   };
 
 
