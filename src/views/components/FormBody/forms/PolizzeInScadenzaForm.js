@@ -1,16 +1,17 @@
 import { Button, Group } from '@mantine/core';
 import { YearPickerInput } from '@mantine/dates';
 import { MonthPickerInput } from '@mantine/dates';
-import { useEffect, useState } from 'react';
+import { useEffect , useState } from 'react';
 import { getForms, searchByDate } from '../../../../services/dbRequests';
 
 
 export function PolizzeInScadenzaForm({ form }) {
 
-  const [year, setYear] = useState(null);
-  const [month, setMonth] = useState(null);
   const [policies, setPolicies] = useState([]);
-
+  const [mensili, setMensili] = useState([]);
+  const [trimestrale, setTrimestrale] = useState([]);
+  const [semestrale, setSemestrale] = useState([]);
+  const [annuale, setAnnuale] = useState([]);
 
   useEffect(()=>{
     let tempArray = []
@@ -30,29 +31,9 @@ export function PolizzeInScadenzaForm({ form }) {
     .catch(error => console.error('Error:', error))
   },[])
 
-  const handleYearChange = (newYear) => {
-    if (newYear) {
-      console.log('Year:', newYear.getFullYear());
-      setYear(newYear);
-    } else {
-      setYear(null);
-    }
-  };
-
-  const handleMonthChange = (newMonth) => {
-    if (newMonth) {
-      setMonth(newMonth);
-    } else {
-      setMonth(null);
-    }
-  };
-
-
-  const handleSubmit = async (event) => {
-    event.preventDefault(); 
-  
+  const handleSubmit = async (values) => {
     // Create a new Date object from the selected year and month
-    const selectedDate = new Date(year.getFullYear(), month.getMonth() + 1, 1); // Month is 0-indexed, so we add 1
+    const selectedDate = new Date(values.year.getFullYear(), values.month ? values.month.getMonth() + 1 : 1, 1);
   
     // Define the end dates for each periodicity
     const endDateAnnuale = new Date(selectedDate);
@@ -89,33 +70,79 @@ export function PolizzeInScadenzaForm({ form }) {
       }
     });
   
-    console.log(filteredPolicies);
+    setMensili(filteredPolicies.mensile)
+    setTrimestrale(filteredPolicies.trimestrale)
+    setSemestrale(filteredPolicies.semestrale)
+    setAnnuale(filteredPolicies.annuale)
   };
 
+  return (
+   <div>
+     <form onSubmit={form.onSubmit(handleSubmit)}>
+     <YearPickerInput
+      label="Seleziona Anno"
+      placeholder="Seleziona Anno"
+      value={form.values.year}
+      onChange={(date) => form.setFieldValue('year', date)}
+      error={form.errors.year}
+      mx="auto"
+      maw={400}
+    />
 
-    return (
-      <form onSubmit={handleSubmit}>
-       <YearPickerInput
-        label="Seleziona Anno"
-        placeholder="Seleziona Anno"
-        value={year}
-        onChange={handleYearChange}
-        mx="auto"
-        maw={400}
-      />
+    <MonthPickerInput
+      label="Seleziona Mese"
+      placeholder="Seleziona Mese"
+      value={form.values.month}
+      onChange={(date) => form.setFieldValue('month', date)}
+      error={form.errors.month}
+      mx="auto"
+      maw={400}
+    />
 
-      <MonthPickerInput
-        label="Seleziona Mese"
-        placeholder="Seleziona Mese"
-        value={month}
-        onChange={handleMonthChange}
-        mx="auto"
-        maw={400}
-      />
+    <Group position="right" mt="md">        
+      <Button type="submit">Estrai</Button>
+    </Group>
+    </form>
 
-        <Group position="right" mt="md">        
-          <Button type="submit">Estrai</Button>
-        </Group>
-      </form>
-    );
+    <div style={{display:"flex",flexDirection:"column"}}>
+  {(mensili.length > 0 || trimestrale.length > 0 || semestrale.length > 0 || annuale.length > 0) && <span>Polizze in Scadenza:</span>}
+  
+  {mensili.length > 0 &&  
+    <div>
+      <span>Mensili:</span>
+      {mensili.map((policy, index) => (
+        <div key={index}>{policy.name}</div> // Replace 'name' with the actual property you want to display
+      ))}
+    </div>
   }
+  
+  {trimestrale.length > 0 && 
+    <div>
+      <span>Trimestrali:</span>
+      {trimestrale.map((policy, index) => (
+        <div key={index}>{policy.name}</div> // Replace 'name' with the actual property you want to display
+      ))}
+    </div>
+  }
+  
+  {semestrale.length > 0 &&  
+    <div>
+      <span>Semestrali:</span>
+      {semestrale.map((policy, index) => (
+        <div key={index}>{policy.name}</div> // Replace 'name' with the actual property you want to display
+      ))}
+    </div>
+  }
+  
+  {annuale.length > 0 && 
+    <div>
+      <span>Annuali:</span>
+      {annuale.map((policy, index) => (
+        <div key={index}>{policy.name}</div> // Replace 'name' with the actual property you want to display
+      ))}
+    </div>
+  }
+</div>
+   </div>
+  );
+}

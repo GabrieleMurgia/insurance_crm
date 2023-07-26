@@ -1,23 +1,90 @@
 import React from 'react';
-import { TextInput, Button, Group, Radio , Box } from '@mantine/core';
+import { Paper, Grid, Col, Text } from '@mantine/core';
 
 
-const ItemPolizza = ({ polizza }) => (
-  <Box display={"flex"} style={{gap:"20px",marginTop:"10px",padding:"10px 20px",backgroundColor:"rgb(240, 240, 240)",borderRadius:"15px",border:"1px solid rgb(175, 175, 175)"}}>
-    {polizza.nome && <><div style={{display:"flex",flexDirection:"column"}}> <span style={{fontWeight:"bold"}}>Nome:</span> <span>{polizza?.nome}</span> </div>
-    <div style={{display:"flex",flexDirection:"column"}}> <span style={{fontWeight:"bold"}}>Cognome:</span> <span>{polizza?.cognome}</span> </div></>
-    }
-    <div style={{display:"flex",flexDirection:"column"}}> <span style={{fontWeight:"bold"}}>Punto Vendita:</span> <span>{polizza?.compagnia}</span> </div>
-    <div style={{display:"flex",flexDirection:"column"}}> <span style={{fontWeight:"bold"}}>Polizza:</span> <span>{polizza?.polizza}</span> </div>
-    <div style={{display:"flex",flexDirection:"column"}}> <span style={{fontWeight:"bold"}}>Prodotto:</span> <span>{polizza?.prodotto}</span> </div>
-    <div style={{display:"flex",flexDirection:"column"}}> <span style={{fontWeight:"bold"}}>Targa:</span> <span>{polizza?.targa}</span> </div>
-    <div style={{display:"flex",flexDirection:"column"}}> <span style={{fontWeight:"bold"}}>Effetto:</span> <span>{polizza?.effetto}</span> </div>
-    <div style={{display:"flex",flexDirection:"column"}}> <span style={{fontWeight:"bold"}}>Scadenza:</span> <span>{polizza?.scadenza}</span> </div>
-    <div style={{display:"flex",flexDirection:"column"}}> <span style={{fontWeight:"bold"}}>Premio:</span> <span>{polizza?.premio}</span> </div>
-    <div style={{display:"flex",flexDirection:"column"}}> <span style={{fontWeight:"bold"}}>Commissioni:</span> <span>{polizza?.commissioni}</span> </div>
-    <div style={{display:"flex",flexDirection:"column"}}> <span style={{fontWeight:"bold"}}>Totale:</span> <span>{polizza?.totale + polizza?.premio }</span> </div>
-    <div style={{display:"flex",flexDirection:"column"}}> <span style={{fontWeight:"bold"}}>Rata:</span> <span>{polizza?.totale + polizza?.premio }</span> </div>
-  </Box>
-);
 
-export default ItemPolizza;
+export const ItemPolizza = ({ polizza }) => {
+
+  console.log( parseInt(polizza.premio) , parseInt(polizza.commissioni))
+
+  let premio = parseInt(polizza.premio)
+  let commissioni = parseInt(polizza.commissioni)
+  let totale = parseInt(polizza.totale)
+
+  return (
+    <Paper 
+  padding="md" 
+  radius="md" 
+  shadow="xs" 
+  miw={600}
+  style={{ 
+    marginTop: 10, 
+    backgroundColor: '#f9f9f9', 
+    border: '1px solid black' 
+  }}
+>
+  {polizza.nome && (
+    <Grid gutter="md" style={{ marginBottom: 10 }}>
+      <Col span={6}>
+        <Text weight={500} color="gray">Nome:</Text>
+        <Text>{polizza?.nome}</Text>
+      </Col>
+      <Col span={6}>
+        <Text weight={500} color="gray">Cognome:</Text>
+        <Text>{polizza?.cognome}</Text>
+      </Col>
+    </Grid>
+  )}
+
+  <Grid gutter="md" style={{ marginBottom: 10 }}>
+    <Col span={4}>
+      <Text weight={500} color="gray">Punto Vendita:</Text>
+      <Text>{polizza?.compagnia}</Text>
+    </Col>
+    <Col span={4}>
+      <Text weight={500} color="gray">Polizza:</Text>
+      <Text>{polizza?.polizza}</Text>
+    </Col>
+    <Col span={4}>
+      <Text weight={500} color="gray">Prodotto:</Text>
+      <Text>{polizza?.prodotto}</Text>
+    </Col>
+  </Grid>
+
+  <Grid gutter="md" style={{ marginBottom: 10 }}>
+    <Col span={4}>
+      <Text weight={500} color="gray">Targa:</Text>
+      <Text>{polizza?.targa}</Text>
+    </Col>
+    <Col span={4}>
+      <Text weight={500} color="gray">Effetto:</Text>
+      <Text>{polizza?.effetto}</Text>
+    </Col>
+    <Col span={4}>
+      <Text weight={500} color="gray">Scadenza:</Text>
+      <Text>{polizza?.scadenza}</Text>
+    </Col>
+  </Grid>
+
+  <Grid gutter="md">
+    <Col span={3}>
+      <Text weight={500} color="gray">Premio:</Text>
+      <Text>{polizza?.premio}</Text>
+    </Col>
+    <Col span={3}>
+      <Text weight={500} color="gray">Commissioni:</Text>
+      <Text>{polizza?.commissioni}</Text>
+    </Col>
+    <Col span={3}>
+      <Text weight={500} color="gray">Totale:</Text>
+      <Text>{commissioni + premio}</Text>
+    </Col>
+    <Col span={3}>
+      <Text weight={500} color="gray">Rata:</Text>
+      <Text>{commissioni + premio}</Text>
+    </Col>
+  </Grid>
+</Paper>
+  )
+  
+};

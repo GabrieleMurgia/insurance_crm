@@ -65,7 +65,7 @@ export function HeaderMenu({ links , handleTypeForm }) {
           <Group className={classes.links}>
             {items}
             <Button onClick={mostraDB}>Mostra db</Button>  
-            <Button onClick={resettaDB}>Resetta db</Button>  
+          {/*   <Button onClick={resettaDB}>Resetta db</Button>   */}
           </Group>
         </div>
       </Container>

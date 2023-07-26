@@ -43,9 +43,9 @@ export function RicercaClienteForm({ form }) {
 
 
     return (
-        <div style={{width:"100%" , display:"flex",flexDirection:"column",alignItems:"center"}}>
+        <div style={{ display:"flex",flexDirection:"column",justifyContent:"center",alignItems:"center",width:"100%"}}>
 
-      {!showClientModule && <form onSubmit={form.onSubmit((values) => handleShowDbList(values))} style={{width:"20%"}} >
+      {!showClientModule && <form onSubmit={form.onSubmit((values) => handleShowDbList(values))}>
         <TextInput
           label="Cognome"
           {...form.getInputProps('cognome')}

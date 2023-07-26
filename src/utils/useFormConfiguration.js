@@ -115,6 +115,32 @@ export function useFormConfiguration({type , client}) {
     },
   }), []);
 
+  const formPolizzeInScadenzaConfig = useMemo(() => ({
+    initialValues: {
+      year: null,
+      month: null,
+    },
+  
+    validate: {
+      year: (value) => (!value ? 'Campo obbligatorio' : null),
+      month: (value) => (!value ? 'Campo obbligatorio' : null),
+    },
+  }), []);
+  
+  const formRateInScadenzaConfig = useMemo(() => ({
+    initialValues: {
+      year: null,
+      month: null,
+    },
+  
+    validate: {
+      year: (value) => (!value ? 'Campo obbligatorio' : null),
+      month: (value) => (!value ? 'Campo obbligatorio' : null),
+    },
+  }), []);
+  
+  const formPolizzeInScadenza = useForm(formPolizzeInScadenzaConfig);
+  const formRateInScadenza = useForm(formRateInScadenzaConfig);
   const formInserimento = useForm(formInserimentoConfig);
   const formInserimentoPolizza = useForm(formInserimentoPolizzaConfig);
   const formDefault = useForm(formDefaultConfig);
@@ -129,14 +155,18 @@ export function useFormConfiguration({type , client}) {
 
 
   if(type === "Inserimento Nuovo Cliente"){
-    return formInserimento
-  }else if(type === "Ricerca Cliente"){
-    return formRicercaCliente
+    return formInserimento;
+  } else if(type === "Ricerca Cliente"){
+    return formRicercaCliente;
   } else if(type === "Inserimento Nuova polizza"){
-    return formInserimentoPolizza
+    return formInserimentoPolizza;
   } else if(type === "Ricerca Polizza"){
-    return formRicercaPolizza
-  } else{
-    return formDefault
+    return formRicercaPolizza;
+  } else if(type === "Polizze In Scadenza"){
+    return formPolizzeInScadenza;
+  } else if(type === "Rate In Scadenza"){
+    return formRateInScadenza;
+  } else {
+    return formDefault;
   }
 }

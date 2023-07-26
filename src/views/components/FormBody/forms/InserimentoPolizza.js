@@ -16,24 +16,39 @@ export function InserimentoPolizzaForm({client}) {
           .catch(error => console.error('Error:', error))
       },[])
 
-    const handleSubmit = (values) => {
-      console.log(values)
+    const handleSubmit = (values) => {     
       // Get the existing polizze from the client
-      let existingPolizze = JSON.parse(JSON.parse(client.polizza) || '[]');
-      console.log(client.polizza,"FISCHERO")
-  
-      // Check if existingPolizze is an array
-      if (!Array.isArray(existingPolizze)) {
-          existingPolizze = [];
-      }
-  
-      // Add the new polizza to the existing ones
-      const updatedPolizze = [...existingPolizze, values];
+      let existingPolizze = JSON.parse(client.polizza) || '[]';
+      let updatedPolizze =[]
+      let tempArray = []
 
-      console.log(updatedPolizze,"UB BEL FIS")
-  
-      // Call the update function with the client id and the updated polizze
-      updateClientPolizza(client.id, JSON.stringify(updatedPolizze));
+      if(existingPolizze[0] === ""){
+        updatedPolizze = values
+        updateClientPolizza(client.id, JSON.stringify(updatedPolizze));
+        return
+      }else{
+       if(Array.isArray(existingPolizze)){
+        updatedPolizze = [...existingPolizze, values];
+        updateClientPolizza(client.id, JSON.stringify(updatedPolizze));
+        return
+       }else{
+        if(Array.isArray(JSON.parse(existingPolizze))){
+          tempArray = JSON.parse(existingPolizze)
+          tempArray.push(values)
+          updateClientPolizza(client.id, JSON.stringify(tempArray));
+          return
+        }
+        tempArray = [...tempArray,JSON.parse(existingPolizze)]        
+        if (tempArray.length === 1) {
+          tempArray.push(values);
+        } else {
+          tempArray = [...tempArray[0], values];
+        }
+        
+        console.log(tempArray);
+        updateClientPolizza(client.id, JSON.stringify(tempArray));
+       }
+      }
   };
 
   

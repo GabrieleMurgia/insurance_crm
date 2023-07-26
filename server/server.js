@@ -10,15 +10,9 @@ app.use(bodyParser.json());
 app.post('/submit-form', (req, res) => {
   const formValues = req.body;
 
-  console.log(formValues)
-
-  // Se polizza è null, imposta una stringa vuota
-  if (formValues.polizza === null) {
-    formValues.polizza = '';
-  }
-
   if (formValues.id) {
     // Se l'ID esiste, aggiorna l'elemento esistente
+    console.log(formValues.id)
     db.get('SELECT polizza FROM formTable WHERE id = ?', [formValues.id], (err, row) => {
       if (err) {
         console.error(err.message);
@@ -31,14 +25,14 @@ app.post('/submit-form', (req, res) => {
         existingPolicies.push(formValues.polizza);
 
         // Inserisci l'array aggiornato nel database
-        db.run(`UPDATE formTable SET polizza = ? WHERE id = ?`,
-          [JSON.stringify(existingPolicies), formValues.id],
+        db.run(`UPDATE formTable SET nome = ?, cognome = ?, sesso = ?, dataDiNascita = ?, luogo = ?, nazione = ?, indirizzo = ?, regione = ?, provincia = ?, comune = ?, cap = ?, telefono1 = ?, telefono2 = ?, email = ?, codiceFiscale = ?, polizza = ? WHERE id = ?`,
+          [formValues.nome, formValues.cognome, formValues.sesso, formValues.dataDiNascita, formValues.luogo, formValues.nazione, formValues.indirizzo, formValues.regione, formValues.provincia, formValues.comune, formValues.cap, formValues.telefono1, formValues.telefono2, formValues.email, formValues.codiceFiscale, JSON.stringify(existingPolicies), formValues.id],
           function(err) {
             if (err) {
               console.error(err.message);
-              res.status(500).json({ message: 'Error updating policies.' });
+              res.status(500).json({ message: 'Error updating client.' });
             } else {
-              console.log(`Policies for client with id ${formValues.id} have been updated.`);
+              console.log(`Client with id ${formValues.id} has been updated.`);
               res.json({ message: 'Form submitted successfully.' });
             }
           }

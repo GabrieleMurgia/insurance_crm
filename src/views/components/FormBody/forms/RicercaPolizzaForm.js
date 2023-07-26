@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { TextInput, Button, Group } from '@mantine/core';
-import ItemPolizza from '../../policyDetails/elementoPolizze';
+import { ItemPolizza } from '../../policyDetails/elementoPolizze';
 import { getForms } from '../../../../services/dbRequests';
 import { ScrollArea } from '@mantine/core';
 
@@ -8,6 +8,7 @@ export function RicercaPolizzaForm({ form }) {
 
   const [policies, setPolicies] = useState([]);
   const [filteredPolicies, setFilteredPolicies] = useState([]);
+  const [showForm,setShowForm] = useState(true)
 
   useEffect(() => {
     let tempArray = []
@@ -16,10 +17,17 @@ export function RicercaPolizzaForm({ form }) {
     .then(data => {
       data.map(item=>{
         if(item.polizza.length !== 0){
+          if(Array.isArray(item.polizza)){
+            return
+          }
           tempItem = JSON.parse(item.polizza)
+         if(Array.isArray(tempItem)){
           tempItem.map(genni =>{
             tempArray.push({...genni,nome:item.nome,cognome:item.cognome})
           })
+         }else{
+          tempArray.push(tempItem)
+         }
           tempItem = null
         }
       })
@@ -43,7 +51,8 @@ export function RicercaPolizzaForm({ form }) {
 
   return (
     <div style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
-    <form onSubmit={form.onSubmit((values) => handleSearch(values))}>
+      <Button onClick={()=>{setShowForm(!showForm)}}>X</Button>
+    {showForm && <form onSubmit={form.onSubmit((values) => handleSearch(values))}>
         <div style={{display:"flex"}}>
         <TextInput
         label="Cognome"
@@ -74,9 +83,9 @@ export function RicercaPolizzaForm({ form }) {
         <Button type="reset">Reset</Button>
         <Button type="submit">Ricerca</Button>
       </Group>
-    </form>
+    </form>}
     <div>
-       <ScrollArea h={160}>
+       <ScrollArea h={showForm ? 160 : 500}>
        {filteredPolicies.map((policy, index) => (
          <ItemPolizza key={index} polizza={policy} />
       ))}

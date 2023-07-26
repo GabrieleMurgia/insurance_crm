@@ -3,7 +3,6 @@ import axios from 'axios';
 const API_URL = 'http://localhost:3001';
 
 export function submitForm(values) {
-  console.log("EWAI")
   return axios.post(`${API_URL}/submit-form`, values)
     .then(response => response.data)
     .catch(error => {
@@ -55,7 +54,6 @@ export function searchClients(cognome, codiceFiscale) {
 }
 
 export function updateClientPolizza(id, polizzaValues) {
-  console.log("ciao")
   return axios.put(`${API_URL}/update-client-polizza`, { id, polizzaValues })
     .then(response => response.data)
     .catch(error => {

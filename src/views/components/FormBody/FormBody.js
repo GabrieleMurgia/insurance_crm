@@ -11,6 +11,8 @@ export function FormBody({type}) {
 
  const formRicercaCliente = useFormConfiguration({type: "Ricerca Cliente"})
  const formRicercaPolizza = useFormConfiguration({type: "Ricerca Polizza"})
+ const formPolizzeInScadenza = useFormConfiguration({type: "Polizze In Scadenza"})
+ const formRateInScadenza = useFormConfiguration({type: "Rate In Scadenza"})
  const form = useFormConfiguration("")
 
 
@@ -21,8 +23,8 @@ export function FormBody({type}) {
      {type === "Ricerca Cliente" && <RicercaClienteForm form={formRicercaCliente} />}
       {type === "Inserimento Nuovo Cliente" && <InserimentoNuovoClienteForm />}
       {type === "Ricerca Polizza" && <RicercaPolizzaForm form={formRicercaPolizza} />}
-      {type === "Polizze in Scadenza" && <PolizzeInScadenzaForm form={form} />}
-      {type === "Rate in Scadenza" && <RateInScadenzaForm form={form} />}
+      {type === "Polizze in Scadenza" && <PolizzeInScadenzaForm form={formPolizzeInScadenza} />}
+      {type === "Rate in Scadenza" && <RateInScadenzaForm form={formRateInScadenza} />}
     </Box>
    </>
   );

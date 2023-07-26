@@ -6,7 +6,7 @@ import { InserimentoPolizzaForm } from './InserimentoPolizza';
 import { DatePickerInput } from '@mantine/dates';
 import { nazioniDelMondo, provincePerRegione, regioniItaliane } from '../../../../utils/variabili';
 import { Select } from '@mantine/core';
-import ItemPolizza from '../../policyDetails/elementoPolizze';
+import { ItemPolizza } from '../../policyDetails/elementoPolizze';
 import { ScrollArea } from '@mantine/core';
 
 export function InserimentoNuovoClienteForm({client , updateClient}) {
@@ -19,9 +19,10 @@ export function InserimentoNuovoClienteForm({client , updateClient}) {
   const [valueNazione, setValueNazione] = useState(null)
   const [valueProvincia, setValueProvincia] = useState(null);
   const [province, setProvince] = useState([]);
+  const [showForm,setShowForm] = useState(true)
 
   const handleSubmitForm = (client, values) => {
-    console.log(values)
+   
     if (!client) {
       if(values.polizza){
         submitForm(values)
@@ -36,8 +37,14 @@ export function InserimentoNuovoClienteForm({client , updateClient}) {
         })
         .catch(error => console.error('Error:', error));
       }
-    } else {
-      alert("fatto");
+    } else if(client) {
+      console.log(values)
+      submitForm(values)
+      .then(data => {
+        if(updateClient)updateClient(data); // Aggiorna lo stato `client` utilizzando la funzione callback
+      })
+      .catch(error => console.error('Error:', error));
+      alert("Non è andata");
     }
   }
 
@@ -59,11 +66,16 @@ export function InserimentoNuovoClienteForm({client , updateClient}) {
   }
 
   useEffect(()=>{
-    if(client && client.polizza) {
+    let tempArray = []
+    if(client && client.polizza[0] !== "") {
       try {
         const polizzeData = JSON.parse(JSON.parse(client.polizza))
-        setPolizze(polizzeData);
-        console.log(polizze)
+        tempArray.push(polizzeData)
+        if(Array.isArray(polizzeData)){
+          setPolizze(polizzeData);
+        }else{
+          setPolizze(tempArray);
+        }
       } catch (error) {
         // Log any error during parsing
         console.error('Error parsing JSON:', error);
@@ -73,178 +85,172 @@ export function InserimentoNuovoClienteForm({client , updateClient}) {
 
 
     return (
-      <>
-      {!showInserimentoPolizza &&
-       <form onSubmit={form.onSubmit((values) => {
-        handleSubmitForm(client,values);
-      })}>
-      <div style={{display:"flex",justifyContent:"space-between"}}>
-      <TextInput
-          label="Cognome"
-          value={client?.cognome}
-          {...form.getInputProps('cognome')}
-          error={form.errors.cognome}
-        />
-        <TextInput
-          label="Nome"
-          value={client?.nome}
-          {...form.getInputProps('nome')}
-          error={form.errors.nome}
-        />
-       <div>
-  <label>Sesso</label>
-  <Radio
-    {...form.getInputProps('sesso')}
-    checked={form.values.sesso === 'Maschio'}
-    value="Maschio"
-    label="Maschio"
-    onChange={() => form.setFieldValue('sesso', 'Maschio')}
-  />
-  <Radio
-    {...form.getInputProps('sesso')}
-    checked={form.values.sesso === 'Femmina'}
-    value="Femmina"
-    label="Femmina"
-    onChange={() => form.setFieldValue('sesso', 'Femmina')}
-  />
-</div>
-      </div>
-
-        <div style={{display:"flex",justifyContent:"space-between"}}>
-
-     {/*  <DatePickerInput
-        placeholder=" Data di nascita "
-        label=" Data Di nascita "
-        withAsterisk
-        value={client?.['dataDiNascita'] ? new Date(client?.['dataDiNascita']) : null}
-        {...form.getInputProps(client?.['dataDiNascita'] ? new Date(client?.['dataDiNascita']) : null)}
-        error={form.errors.scadenza}
-        /> */}
-
-<DatePickerInput
-  placeholder=" Data di nascita "
-  label=" Data Di nascita "
-  withAsterisk
-  value={client?.['dataDiNascita'] ? new Date(client?.['dataDiNascita']) : null}
-  onChange={(date) => form.setFieldValue('dataDiNascita', date)}
-  error={form.errors.dataDiNascita}
-/>
-
-       <div>
-       <TextInput
-          label="Luogo"
-          value={client?.luogo}
-          {...form.getInputProps('luogo')}
-          error={form.errors.luogo}
-        />
-     
-        <Select label="Nazione" value={client?.nazione ? client?.nazione : valueNazione } 
-          onChange={setValueRegione} data={nazioniDelMondo} {...form.getInputProps('nazione')} 
-          error={form.errors.nazione} />
-
-           <div style={{display:"flex",alignItems:"flex-end"}}>
-        <TextInput
-          label="Codice fiscale"
-          value={client?.codiceFiscale}
-          {...form.getInputProps('codiceFiscale')}
-          error={form.errors.codiceFiscale}
-        />
-        <Button mt={24} >Genera</Button>
-      </div>
-      {errorMessage && <p style={{color: 'red'}}>{errorMessage}</p>}
-       </div>
+      <div>
+       { <Button onClick={()=>{setShowForm(!showForm)}} style={{justifySelf:"end"}}>X</Button>}
+      {!showInserimentoPolizza && showForm && (
+        <form onSubmit={form.onSubmit((values) => handleSubmitForm(client,values))}>
+          <div style={{display:"flex",justifyContent:"space-between"}}>
+            <TextInput
+              label="Cognome"
+              value={client?.cognome}
+              {...form.getInputProps('cognome')}
+              error={form.errors.cognome}
+            />
+            <TextInput
+              label="Nome"
+              value={client?.nome}
+              {...form.getInputProps('nome')}
+              error={form.errors.nome}
+            />
+            <div>
+              <label>Sesso</label>
+              <Radio
+                {...form.getInputProps('sesso')}
+                checked={form.values.sesso === 'Maschio'}
+                value="Maschio"
+                label="Maschio"
+                onChange={() => form.setFieldValue('sesso', 'Maschio')}
+              />
+              <Radio
+                {...form.getInputProps('sesso')}
+                checked={form.values.sesso === 'Femmina'}
+                value="Femmina"
+                label="Femmina"
+                onChange={() => form.setFieldValue('sesso', 'Femmina')}
+              />
+            </div>
+          </div>
     
-        </div>
-        
-     
-        <div style={{display:"flex",justifyContent:"space-between"}}>
-        <TextInput
-          label="Indirizzo"
-          value={client?.indirizzo}
-          {...form.getInputProps('indirizzo')}
-          error={form.errors.indirizzo}
-        />
+          <div style={{display:"flex",justifyContent:"space-between"}}>
+            <DatePickerInput
+              placeholder=" Data di nascita "
+              label=" Data Di nascita "
+              withAsterisk
+              value={client?.['dataDiNascita'] ? new Date(client?.['dataDiNascita']) : null}
+              onChange={(date) => form.setFieldValue('dataDiNascita', date)}
+              error={form.errors.dataDiNascita}
+            />
     
-      <Select
-      label="Regione"
-      onSelect={(e)=>{getValueFromLabel(e.target.value);setValueRegione([])}}
-      value={client?.regione}
-      data={regioniItaliane}
-      {...form.getInputProps('regione')}
-      error={form.errors.regione}
-      />
-
-        <Select
-          label="Provincia"
-          value={client?.provincia ? client?.provincia : valueProvincia}
-          onChange={(selectedProvincia) => setValueProvincia(selectedProvincia)}
-          data={province}
-          disabled={!valueRegione}
-          {...form.getInputProps('provincia')}
-          error={form.errors.provincia}
-        />
-        </div>
-        <div style={{display:"flex",justifyContent:"space-between"}}>
-        <TextInput
-          label="Comune"
-          value={client?.comune}
-          {...form.getInputProps('comune')}
-          error={form.errors.comune}
-        />
-        <TextInput
-          label="Cap"
-          value={client?.cap}
-          {...form.getInputProps('cap')}
-          error={form.errors.cap}
-        />
-        </div>
-        <div style={{display:"flex",justifyContent:"space-between"}}>
-        <TextInput
-          label="Telefono(1)"
-          value={client?.telefono1}
-          {...form.getInputProps('telefono1')}
-          error={form.errors.telefono1}
-        />
-        <TextInput
-          label="Telefono(2)"
-          value={client?.telefono2}
-          {...form.getInputProps('telefono2')}
-          error={form.errors.telefono2}
-        />
-        <TextInput
-          label="Email"
-          value={client?.email}
-          {...form.getInputProps('email')}
-          error={form.errors.email}
-        />
-        </div>
-        <Group position="right" mt="md">
-          {
-            !client && <><Button type="reset">Reset</Button>
-            <Button type="submit">Invia</Button></>
-          }
-          {
-            client && <>
-            <Button color='red' type="submit" >Modifica</Button>
-            <Button color='blue' type="reset" onClick={handleShowInserimentoPolizza}>Inserisci nuova polizza</Button>
-            </>
-          }
-          
-        </Group>
-      </form>
-      }
+            <div>
+              <TextInput
+                label="Luogo"
+                value={client?.luogo}
+                {...form.getInputProps('luogo')}
+                error={form.errors.luogo}
+              />
+    
+              <Select 
+                label="Nazione" 
+                value={client?.nazione ? client?.nazione : valueNazione } 
+                onChange={setValueRegione} 
+                data={nazioniDelMondo} 
+                {...form.getInputProps('nazione')} 
+                error={form.errors.nazione} 
+              />
+    
+              <div style={{display:"flex",alignItems:"flex-end"}}>
+                <TextInput
+                  label="Codice fiscale"
+                  value={client?.codiceFiscale}
+                  {...form.getInputProps('codiceFiscale')}
+                  error={form.errors.codiceFiscale}
+                />
+                <Button mt={24}>Genera</Button>
+              </div>
+              {errorMessage && <p style={{color: 'red'}}>{errorMessage}</p>}
+            </div>
+          </div>
+    
+          <div style={{display:"flex",justifyContent:"space-between"}}>
+            <TextInput
+              label="Indirizzo"
+              value={client?.indirizzo}
+              {...form.getInputProps('indirizzo')}
+              error={form.errors.indirizzo}
+            />
+    
+            <Select
+              label="Regione"
+              onSelect={(e)=>{getValueFromLabel(e.target.value);setValueRegione([])}}
+              value={client?.regione}
+              data={regioniItaliane}
+              {...form.getInputProps('regione')}
+              error={form.errors.regione}
+            />
+    
+            <Select
+              label="Provincia"
+              value={client?.provincia ? client?.provincia : valueProvincia}
+              onChange={(selectedProvincia) => setValueProvincia(selectedProvincia)}
+              data={province}
+              disabled={!valueRegione}
+              {...form.getInputProps('provincia')}
+              error={form.errors.provincia}
+            />
+          </div>
+    
+          <div style={{display:"flex",justifyContent:"space-between"}}>
+            <TextInput
+              label="Comune"
+              value={client?.comune}
+              {...form.getInputProps('comune')}
+              error={form.errors.comune}
+            />
+            <TextInput
+              label="Cap"
+              value={client?.cap}
+              {...form.getInputProps('cap')}
+              error={form.errors.cap}
+            />
+          </div>
+    
+          <div style={{display:"flex",justifyContent:"space-between"}}>
+            <TextInput
+              label="Telefono(1)"
+              value={client?.telefono1}
+              {...form.getInputProps('telefono1')}
+              error={form.errors.telefono1}
+            />
+            <TextInput
+              label="Telefono(2)"
+              value={client?.telefono2}
+              {...form.getInputProps('telefono2')}
+              error={form.errors.telefono2}
+            />
+            <TextInput
+              label="Email"
+              value={client?.email}
+              {...form.getInputProps('email')}
+              error={form.errors.email}
+            />
+          </div>
+    
+          <Group position="right" mt="md">
+            {!client && (
+              <>
+                <Button type="reset">Reset</Button>
+                <Button type="submit">Invia</Button>
+              </>
+            )}
+            {client && (
+              <>
+                <Button color='red' type="submit">Modifica</Button>
+                <Button color='blue' type="reset" onClick={handleShowInserimentoPolizza}>Inserisci Polizza</Button>
+              </>
+            )}
+          </Group>
+        </form>
+      )}
+    
       {showInserimentoPolizza && <InserimentoPolizzaForm client={client}/>}
-
-     
-    {!showInserimentoPolizza && polizze &&
-     <div>
-      <ScrollArea h={130}>
-      { polizze.map((polizza, index) => (
-        <ItemPolizza polizza={polizza}/>
-        ))}
-        </ScrollArea>
-     </div>
-      }
-      </>
+    
+      {!showInserimentoPolizza && polizze && (
+          <ScrollArea h={showForm ? 130 : 500}>
+            {polizze.map((polizza, index) => (
+              <ItemPolizza polizza={polizza}/>
+            ))}
+          </ScrollArea>
+      )}
+    </div>
     );
   }
