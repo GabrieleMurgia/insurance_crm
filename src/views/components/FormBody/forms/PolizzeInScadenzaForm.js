@@ -1,8 +1,9 @@
-import { Button, Group } from '@mantine/core';
+import { Button, Group, ScrollArea } from '@mantine/core';
 import { YearPickerInput } from '@mantine/dates';
 import { MonthPickerInput } from '@mantine/dates';
 import { useEffect , useState } from 'react';
 import { getForms, searchByDate } from '../../../../services/dbRequests';
+import { ItemPolizza } from '../../policyDetails/elementoPolizze';
 
 
 export function PolizzeInScadenzaForm({ form }) {
@@ -15,58 +16,58 @@ export function PolizzeInScadenzaForm({ form }) {
 
   useEffect(()=>{
     let tempArray = []
-    let tempItem = ""
     getForms()
     .then(data => {
       data.map(item=>{
         if(item.polizza.length !== 0){
-          tempItem = JSON.parse(item.polizza)
-          tempArray.push(tempItem)
-          tempItem = null
+          let tempItem;
+          try {
+            tempItem = JSON.parse(item.polizza);
+          } catch (e) {
+            console.error('Error parsing polizza:', e);
+            return;
+          }
+
+          if(Array.isArray(tempItem)){
+            tempItem.map(genni =>{
+              tempArray.push({...genni,nome:item.nome,cognome:item.cognome});
+            });
+          } else {
+            tempArray.push(tempItem);
+          }
         }
-      })
+      });
       let flattenedArray = tempArray.flat(); // Questa linea appiattisce l'array
-      setPolicies(flattenedArray)
+      setPolicies(flattenedArray);
     })
-    .catch(error => console.error('Error:', error))
+    .catch(error => console.error('Error:', error));
   },[])
 
   const handleSubmit = async (values) => {
     // Create a new Date object from the selected year and month
-    const selectedDate = new Date(values.year.getFullYear(), values.month ? values.month.getMonth() + 1 : 1, 1);
-  
-    // Define the end dates for each periodicity
-    const endDateAnnuale = new Date(selectedDate);
-    endDateAnnuale.setFullYear(endDateAnnuale.getFullYear() + 1);
-  
-    const endDateSemestrale = new Date(selectedDate);
-    endDateSemestrale.setMonth(endDateSemestrale.getMonth() + 6);
-  
-    const endDateTrimestrale = new Date(selectedDate);
-    endDateTrimestrale.setMonth(endDateTrimestrale.getMonth() + 3);
-  
-    const endDateMensile = new Date(selectedDate);
-    endDateMensile.setMonth(endDateMensile.getMonth() + 1);
+    const selectedDate = new Date(values.year.getFullYear(), values.month ? values.month.getMonth() : 1, 1);
   
     // Filter the policies
     const filteredPolicies = {
-      annuale: [],
-      semestrale: [],
-      trimestrale: [],
       mensile: [],
+      trimestrale: [],
+      semestrale: [],
+      annuale: [],
     };
   
     policies.forEach(policy => {
-      const policyScadenza = new Date(policy.scadenza);
+      const policyScadenza = new Date(policy?.scadenza);
+      const diffTime = Math.abs(policyScadenza - selectedDate);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
   
-      if (policy.periodicita === 'Annuale' && policyScadenza <= endDateAnnuale) {
-        filteredPolicies.annuale.push(policy);
-      } else if (policy.periodicita === 'Semestrale' && policyScadenza <= endDateSemestrale) {
-        filteredPolicies.semestrale.push(policy);
-      } else if (policy.periodicita === 'Trimestrale' && policyScadenza <= endDateTrimestrale) {
-        filteredPolicies.trimestrale.push(policy);
-      } else if (policy.periodicita === 'Mensile' && policyScadenza <= endDateMensile) {
+      if (diffDays <= 30) {
         filteredPolicies.mensile.push(policy);
+      } else if (diffDays <= 90) {
+        filteredPolicies.trimestrale.push(policy);
+      } else if (diffDays <= 180) {
+        filteredPolicies.semestrale.push(policy);
+      } else if (diffDays <= 360) {
+        filteredPolicies.annuale.push(policy);
       }
     });
   
@@ -74,10 +75,12 @@ export function PolizzeInScadenzaForm({ form }) {
     setTrimestrale(filteredPolicies.trimestrale)
     setSemestrale(filteredPolicies.semestrale)
     setAnnuale(filteredPolicies.annuale)
+  
+    console.log(mensili,trimestrale,semestrale,annuale)
   };
 
   return (
-   <div>
+   <div style={{display:"flex",justifyContent:"space-around",width:"100%"}}>
      <form onSubmit={form.onSubmit(handleSubmit)}>
      <YearPickerInput
       label="Seleziona Anno"
@@ -104,45 +107,58 @@ export function PolizzeInScadenzaForm({ form }) {
     </Group>
     </form>
 
+    
+  {(mensili.length > 0 || trimestrale.length > 0 || semestrale.length > 0 || annuale.length > 0) && <>
+ 
     <div style={{display:"flex",flexDirection:"column"}}>
-  {(mensili.length > 0 || trimestrale.length > 0 || semestrale.length > 0 || annuale.length > 0) && <span>Polizze in Scadenza:</span>}
-  
-  {mensili.length > 0 &&  
-    <div>
-      <span>Mensili:</span>
+ <div style={{display:"flex"}}>
+ {mensili.length > 0 &&  
+    <div style={{display: "flex", flexDirection: "column", fontWeight: "bold", margin: "10px"}}>
+      <span>Scade tra un mese:</span>
+      <ScrollArea h={400}>
       {mensili.map((policy, index) => (
-        <div key={index}>{policy.name}</div> // Replace 'name' with the actual property you want to display
+         <ItemPolizza key={index} polizza={policy}></ItemPolizza>
       ))}
+      </ScrollArea>
     </div>
   }
   
   {trimestrale.length > 0 && 
-    <div>
-      <span>Trimestrali:</span>
+    <div style={{display: "flex", flexDirection: "column", fontWeight: "bold", margin: "10px"}}>
+      <span>Scade tra tre mesi:</span>
+      <ScrollArea h={400}>
       {trimestrale.map((policy, index) => (
-        <div key={index}>{policy.name}</div> // Replace 'name' with the actual property you want to display
+        <ItemPolizza key={index} polizza={policy}></ItemPolizza>
       ))}
+      </ScrollArea>
     </div>
   }
   
   {semestrale.length > 0 &&  
-    <div>
-      <span>Semestrali:</span>
+    <div style={{display: "flex", flexDirection: "column", fontWeight: "bold", margin: "10px"}}>
+      <span>Scade tra sei mesi:</span>
+      <ScrollArea h={400}>
       {semestrale.map((policy, index) => (
-        <div key={index}>{policy.name}</div> // Replace 'name' with the actual property you want to display
+         <ItemPolizza key={index} polizza={policy}></ItemPolizza>
       ))}
+      </ScrollArea>
     </div>
   }
   
   {annuale.length > 0 && 
-    <div>
-      <span>Annuali:</span>
+    <div style={{display: "flex", flexDirection: "column", fontWeight: "bold", margin: "10px"}}>
+      <span>Scade tra un anno:</span>
+      <ScrollArea h={400}>
       {annuale.map((policy, index) => (
-        <div key={index}>{policy.name}</div> // Replace 'name' with the actual property you want to display
+        <ItemPolizza key={index} polizza={policy}></ItemPolizza>
       ))}
+      </ScrollArea>
+    
     </div>
   }
+ </div>
 </div>
+  </>}
    </div>
   );
 }
