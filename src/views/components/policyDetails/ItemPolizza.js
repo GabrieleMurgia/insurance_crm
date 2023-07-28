@@ -1,7 +1,16 @@
 import React from 'react';
 import { Paper, Grid, Col, Text } from '@mantine/core';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@mantine/core';
+
 
 export const ItemPolizza = ({ polizza }) => {
+
+  const navigate = useNavigate();
+
+  const handleEdit = () => {
+    navigate('/edit-polizza', { state: { polizza } });
+  };
 
   let premio = parseInt(polizza.premio)
   let commissioni = parseInt(polizza.commissioni)
@@ -78,6 +87,9 @@ export const ItemPolizza = ({ polizza }) => {
         <Col span={4}>
           <Text weight={500} color="gray">Rata:</Text>
           <Text style={{fontSize:"10px"}}>{commissioni + premio}</Text>
+        </Col>
+        <Col span={4}>
+        <Button onClick={handleEdit}>Modifica</Button>
         </Col>
       </Grid>
     </Paper>

@@ -40,6 +40,10 @@ export function RicercaClienteForm({ form }) {
     }
   },[client])
 
+  const resetForm = () => {
+    form.setFieldValue('cognome', '');
+    form.setFieldValue('codiceFiscale', '');
+  };
 
 
     return (
@@ -55,7 +59,7 @@ export function RicercaClienteForm({ form }) {
           {...form.getInputProps('codiceFiscale')}
         />
         <Group position="right" mt="md">
-          <Button type="reset">Reset</Button>
+        <Button type="reset" onClick={resetForm}>Reset</Button>
           <Button type="submit" >Ricerca</Button>
         </Group>
       </form>}

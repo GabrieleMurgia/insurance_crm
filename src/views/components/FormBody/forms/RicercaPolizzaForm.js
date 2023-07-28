@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { TextInput, Button, Group } from '@mantine/core';
-import { ItemPolizza } from '../../policyDetails/elementoPolizze';
+import { ItemPolizza } from '../../policyDetails/ItemPolizza';
 import { getForms } from '../../../../services/dbRequests';
 import { ScrollArea } from '@mantine/core';
 
@@ -9,6 +9,15 @@ export function RicercaPolizzaForm({ form }) {
   const [policies, setPolicies] = useState([]);
   const [filteredPolicies, setFilteredPolicies] = useState([]);
   const [showForm,setShowForm] = useState(true)
+
+  const resetForm = () => {
+    form.setFieldValue('cognome', '');
+    form.setFieldValue('nome', '');
+    form.setFieldValue('targa', '');
+    form.setFieldValue('polizza', '');
+    form.setFieldValue('puntoVendita', '');
+    form.setFieldValue('compagnia', '');
+  };
 
   useEffect(() => {
     let tempArray = []
@@ -23,7 +32,7 @@ export function RicercaPolizzaForm({ form }) {
           tempItem = JSON.parse(item.polizza)
          if(Array.isArray(tempItem)){
           tempItem.map(genni =>{
-            tempArray.push({...genni,nome:item.nome,cognome:item.cognome})
+            tempArray.push({...genni,nome:item.nome,cognome:item.cognome,id:item.id})
           })
          }else{
           tempArray.push(tempItem)
@@ -50,8 +59,8 @@ export function RicercaPolizzaForm({ form }) {
 
 
   return (
-    <div style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
-      <Button onClick={()=>{setShowForm(!showForm)}}>X</Button>
+    <div style={{display:"flex",alignItems:"center",justifyContent:"center"}}>
+      <Button style={{alignSelf:"start"}} onClick={()=>{setShowForm(!showForm)}}>X</Button>
     {showForm && <form onSubmit={form.onSubmit((values) => handleSearch(values))}>
         <div style={{display:"flex"}}>
         <TextInput
@@ -80,12 +89,13 @@ export function RicercaPolizzaForm({ form }) {
         {...form.getInputProps('compagnia')}
       />
       <Group position="right" mt="md">
-        <Button type="reset">Reset</Button>
+      <Button type="reset" onClick={resetForm}>Reset</Button>
         <Button type="submit">Ricerca</Button>
       </Group>
     </form>}
     <div>
-       <ScrollArea h={showForm ? 160 : 500}>
+      <span style={{fontWeight:"bold"}}>Polizze:</span>
+       <ScrollArea ml={showForm ? 50 : 0} h={showForm ? 500 : 500}>
        {filteredPolicies.map((policy, index) => (
          <ItemPolizza key={index} polizza={policy} />
       ))}

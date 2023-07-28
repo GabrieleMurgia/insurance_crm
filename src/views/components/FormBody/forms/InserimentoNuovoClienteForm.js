@@ -6,8 +6,10 @@ import { InserimentoPolizzaForm } from './InserimentoPolizza';
 import { DatePickerInput } from '@mantine/dates';
 import { nazioniDelMondo, provincePerRegione, regioniItaliane } from '../../../../utils/variabili';
 import { Select } from '@mantine/core';
-import { ItemPolizza } from '../../policyDetails/elementoPolizze';
+import { ItemPolizza } from '../../policyDetails/ItemPolizza';
 import { ScrollArea } from '@mantine/core';
+import { toast } from 'react-hot-toast';
+
 
 export function InserimentoNuovoClienteForm({client , updateClient}) {
 
@@ -21,6 +23,7 @@ export function InserimentoNuovoClienteForm({client , updateClient}) {
   const [province, setProvince] = useState([]);
   const [showForm,setShowForm] = useState(true)
 
+
   const handleSubmitForm = (client, values) => {
    
     if (!client) {
@@ -28,23 +31,25 @@ export function InserimentoNuovoClienteForm({client , updateClient}) {
         submitForm(values)
         .then(data => {
           if(updateClient)updateClient(data); // Aggiorna lo stato `client` utilizzando la funzione callback
+          toast.success('operazione riuscita!')
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {toast.error("Operazione Fallita")});
       }else{
         submitForm({...values,polizza:""})
         .then(data => {
           if(updateClient)updateClient(data); // Aggiorna lo stato `client` utilizzando la funzione callback
+          toast.success('operazione riuscita!')
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {toast.error("Operazione Fallita")});
       }
     } else if(client) {
       console.log(values)
       submitForm(values)
       .then(data => {
-        if(updateClient)updateClient(data); // Aggiorna lo stato `client` utilizzando la funzione callback
+        if(updateClient)updateClient(data); // Aggiorna lo stato `client` utilizzando la funzione callbac
+        toast.success('operazione riuscita!')
       })
-      .catch(error => console.error('Error:', error));
-      alert("Non è andata");
+      .catch(error => {toast.error("Operazione Fallita")});
     }
   }
 
@@ -65,7 +70,7 @@ export function InserimentoNuovoClienteForm({client , updateClient}) {
     }
   }
 
-  useEffect(()=>{
+/*   useEffect(()=>{
     let tempArray = []
     if(client && client.polizza[0] !== "") {
       try {
@@ -81,12 +86,68 @@ export function InserimentoNuovoClienteForm({client , updateClient}) {
         console.error('Error parsing JSON:', error);
       }
     }
-  },[client])
+  },[client]) */
+
+  useEffect(() => {
+    if (client?.['dataDiNascita']) {
+      const date = new Date(client?.['dataDiNascita']);
+      form.setFieldValue('dataDiNascita', new Date(date));
+    }
+  }, [client]);
+  
+
+  const resetForm = () => {
+    form.setFieldValue('cognome', '');
+    form.setFieldValue('nome', '');
+    form.setFieldValue('sesso', '');
+    form.setFieldValue('dataDiNascita', null);
+    form.setFieldValue('luogo', '');
+    form.setFieldValue('nazione', '');
+    form.setFieldValue('codiceFiscale', '');
+    form.setFieldValue('indirizzo', '');
+    form.setFieldValue('regione', '');
+    form.setFieldValue('provincia', '');
+    form.setFieldValue('comune', '');
+    form.setFieldValue('cap', '');
+    form.setFieldValue('telefono1', '');
+    form.setFieldValue('telefono2', '');
+    form.setFieldValue('email', '');
+  };
+
+// Funzione per estrarre le consonanti da una stringa
+function extractConsonants(str) {
+  return str.toUpperCase().split('').filter(char => 'BCDFGHJKLMNPQRSTVWXYZ'.includes(char));
+}
+
+// Funzione per generare il codice fiscale
+function generateCodiceFiscale(cognome, nome, dataDiNascita, sesso, luogo) {
+  const cognomeConsonants = extractConsonants(cognome);
+  const nomeConsonants = extractConsonants(nome);
+  const year = dataDiNascita.getFullYear().toString().slice(-2);
+  const month = 'ABCDEHLMPRST'.charAt(dataDiNascita.getMonth());
+  const day = sesso === 'Femmina' ? dataDiNascita.getDate() + 40 : dataDiNascita.getDate();
+
+  // Genera le prime 6 lettere dal cognome e dal nome
+  let codiceFiscale = (cognomeConsonants.slice(0, 3).join('') + nomeConsonants.slice(0, 3).join('')).padEnd(6, 'X');
+
+  // Aggiunge la data di nascita
+  codiceFiscale += year + month + day.toString().padStart(2, '0');
+
+  // Aggiunge un codice di comune fittizio
+  codiceFiscale += 'Z000';
+
+  // Genera un carattere di controllo fittizio
+  const controlChar = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.charAt(Math.floor(Math.random() * 26));
+  codiceFiscale += controlChar;
+
+  return codiceFiscale;
+}
+
 
 
     return (
-      <div>
-       { <Button onClick={()=>{setShowForm(!showForm)}} style={{justifySelf:"end"}}>X</Button>}
+      <div style={ !showInserimentoPolizza ? {display:"flex"} : {}}>
+       { polizze.length > 0 && <Button onClick={()=>{setShowForm(!showForm)}} style={{justifySelf:"end"}}>X</Button>}
       {!showInserimentoPolizza && showForm && (
         <form onSubmit={form.onSubmit((values) => handleSubmitForm(client,values))}>
           <div style={{display:"flex",justifyContent:"space-between"}}>
@@ -122,14 +183,15 @@ export function InserimentoNuovoClienteForm({client , updateClient}) {
           </div>
     
           <div style={{display:"flex",justifyContent:"space-between"}}>
-            <DatePickerInput
-              placeholder=" Data di nascita "
-              label=" Data Di nascita "
-              withAsterisk
-              value={client?.['dataDiNascita'] ? new Date(client?.['dataDiNascita']) : null}
-              onChange={(date) => form.setFieldValue('dataDiNascita', date)}
-              error={form.errors.dataDiNascita}
-            />
+
+<DatePickerInput
+  placeholder=" Data di nascita "
+  label=" Data Di nascita "
+  withAsterisk
+  value={form.values.dataDiNascita ? new Date(form.values.dataDiNascita) : null}
+  onChange={(date) => form.setFieldValue('dataDiNascita', new Date(date))}
+  error={form.errors.dataDiNascita}
+/>
     
             <div>
               <TextInput
@@ -155,7 +217,16 @@ export function InserimentoNuovoClienteForm({client , updateClient}) {
                   {...form.getInputProps('codiceFiscale')}
                   error={form.errors.codiceFiscale}
                 />
-                <Button mt={24}>Genera</Button>
+               <Button mt={24} onClick={() => {
+  const codiceFiscale = generateCodiceFiscale(
+    form.values.cognome,
+    form.values.nome,
+    form.values.dataDiNascita,
+    form.values.sesso,
+    form.values.luogo
+  );
+  form.setFieldValue('codiceFiscale', codiceFiscale);
+}}>Genera</Button>
               </div>
               {errorMessage && <p style={{color: 'red'}}>{errorMessage}</p>}
             </div>
@@ -228,7 +299,7 @@ export function InserimentoNuovoClienteForm({client , updateClient}) {
           <Group position="right" mt="md">
             {!client && (
               <>
-                <Button type="reset">Reset</Button>
+                <Button type="reset" onClick={resetForm}>Reset</Button>
                 <Button type="submit">Invia</Button>
               </>
             )}
@@ -244,12 +315,15 @@ export function InserimentoNuovoClienteForm({client , updateClient}) {
     
       {showInserimentoPolizza && <InserimentoPolizzaForm client={client}/>}
     
-      {!showInserimentoPolizza && polizze && (
-          <ScrollArea h={showForm ? 130 : 500}>
+      {polizze.length > 0 && !showInserimentoPolizza && polizze && (
+       <div>
+         {client?.nome && <span style={{fontWeight:"bold"}}>Polizze di {client?.nome} {client?.cognome}</span> }
+          <ScrollArea style={{alignSelf:"center"}} ml={showForm ? 50 : 0} h={showForm ? 500 : 500}>
             {polizze.map((polizza, index) => (
-              <ItemPolizza polizza={polizza}/>
+              <ItemPolizza  polizza={polizza}/>
             ))}
           </ScrollArea>
+       </div>
       )}
     </div>
     );

@@ -3,7 +3,7 @@ import { YearPickerInput } from '@mantine/dates';
 import { MonthPickerInput } from '@mantine/dates';
 import { useEffect , useState } from 'react';
 import { getForms, searchByDate } from '../../../../services/dbRequests';
-import { ItemPolizza } from '../../policyDetails/elementoPolizze';
+import { ItemPolizza } from '../../policyDetails/ItemPolizza';
 
 
 export function PolizzeInScadenzaForm({ form }) {
@@ -30,7 +30,7 @@ export function PolizzeInScadenzaForm({ form }) {
 
           if(Array.isArray(tempItem)){
             tempItem.map(genni =>{
-              tempArray.push({...genni,nome:item.nome,cognome:item.cognome});
+              tempArray.push({...genni,nome:item.nome,cognome:item.cognome,id:item.id});
             });
           } else {
             tempArray.push(tempItem);
@@ -62,11 +62,11 @@ export function PolizzeInScadenzaForm({ form }) {
   
       if (diffDays <= 30) {
         filteredPolicies.mensile.push(policy);
-      } else if (diffDays <= 90) {
+      } else if (diffDays > 30 && diffDays <= 90) {
         filteredPolicies.trimestrale.push(policy);
-      } else if (diffDays <= 180) {
+      } else if (diffDays > 90 && diffDays <= 180) {
         filteredPolicies.semestrale.push(policy);
-      } else if (diffDays <= 360) {
+      } else if (diffDays > 180 && diffDays <= 360) {
         filteredPolicies.annuale.push(policy);
       }
     });
@@ -114,7 +114,7 @@ export function PolizzeInScadenzaForm({ form }) {
  <div style={{display:"flex"}}>
  {mensili.length > 0 &&  
     <div style={{display: "flex", flexDirection: "column", fontWeight: "bold", margin: "10px"}}>
-      <span>Scade tra un mese:</span>
+      <span>Scade entro un mese:</span>
       <ScrollArea h={400}>
       {mensili.map((policy, index) => (
          <ItemPolizza key={index} polizza={policy}></ItemPolizza>
@@ -125,7 +125,7 @@ export function PolizzeInScadenzaForm({ form }) {
   
   {trimestrale.length > 0 && 
     <div style={{display: "flex", flexDirection: "column", fontWeight: "bold", margin: "10px"}}>
-      <span>Scade tra tre mesi:</span>
+      <span>Scade entro tre mesi:</span>
       <ScrollArea h={400}>
       {trimestrale.map((policy, index) => (
         <ItemPolizza key={index} polizza={policy}></ItemPolizza>
@@ -136,7 +136,7 @@ export function PolizzeInScadenzaForm({ form }) {
   
   {semestrale.length > 0 &&  
     <div style={{display: "flex", flexDirection: "column", fontWeight: "bold", margin: "10px"}}>
-      <span>Scade tra sei mesi:</span>
+      <span>Scade entro sei mesi:</span>
       <ScrollArea h={400}>
       {semestrale.map((policy, index) => (
          <ItemPolizza key={index} polizza={policy}></ItemPolizza>
@@ -147,7 +147,7 @@ export function PolizzeInScadenzaForm({ form }) {
   
   {annuale.length > 0 && 
     <div style={{display: "flex", flexDirection: "column", fontWeight: "bold", margin: "10px"}}>
-      <span>Scade tra un anno:</span>
+      <span>Scade entro un anno:</span>
       <ScrollArea h={400}>
       {annuale.map((policy, index) => (
         <ItemPolizza key={index} polizza={policy}></ItemPolizza>
